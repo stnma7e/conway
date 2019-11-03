@@ -5,13 +5,13 @@ import Data.Maybe (fromMaybe)
 import Debug.Trace (trace, traceShowId)
 import System.Random
 
-n = 20
+n = 120
 rands seed = randoms (mkStdGen seed) :: [Double]
-game seed = [[if (round i) == 1 then Alive else Dead | i <- take n $ drop (n*j) $ rands seed] | j <- [1..n]]
+game seed = [[if round i == 1 then Alive else Dead | i <- take n $ drop (n*j) $ rands seed] | j <- [1..n]]
 
 runGame :: Int -> Gol -> IO ()
 runGame n game = if n == 0 then putStrLn $ showGame game else do
-    putStrLn $ showGame game
+    -- putStrLn $ showGame game
     runGame (n - 1) $ step game
 
 data CellState = Alive | Dead
@@ -60,7 +60,7 @@ neighborCells game (rowIdx, colIdx) =
 getRow [] _ = []
 getRow game r = game !! (r `mod` length game)
 getCol [] _ = []
-getCol game c = [row !! (c `mod` length row) | row <- game]
+getCol game c = [getCell row c | row <- game]
 getCell [] _ = Dead
 getCell list c = list !! (c `mod` length list)
 
