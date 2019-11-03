@@ -8,6 +8,7 @@
 //.                .
 
 // An implementation of Conway's Game of Life.
+// Taken from golang.org and edited.
 package main
 
 import (
