@@ -5,13 +5,14 @@ import Data.Maybe (fromMaybe)
 import Debug.Trace (trace, traceShowId)
 import System.Random
 
-n = 120
+n = 10
 rands seed = randoms (mkStdGen seed) :: [Double]
+-- game _ = [[Dead | i <- [1..n]],[Dead | i <- [1..n]],[Dead | i <- [1..n]], [Dead, Dead, Alive, Alive, Alive, Dead, Dead], [Dead | i <- [1..n]],[Dead | i <- [1..n]],[Dead | i <- [1..n]]]
 game seed = [[if round i == 1 then Alive else Dead | i <- take n $ drop (n*j) $ rands seed] | j <- [1..n]]
 
 runGame :: Int -> Gol -> IO ()
 runGame n game = if n == 0 then putStrLn $ showGame game else do
-    -- putStrLn $ showGame game
+    putStrLn $ showGame game
     runGame (n - 1) $ step game
 
 data CellState = Alive | Dead
@@ -34,8 +35,8 @@ step :: Gol -> Gol
 step game = map (uncurry $ stepRow game) $ indexed game
 stepRow game idx = map (uncurry $ stepCell game idx) . indexed
 stepCell game row col cell =
-    let neighbors = neighborCells game (row, col)
-        alive = length [x | x <- neighbors, isAlive x]
+    let neighbors = neighborCells game $ (row, col)
+        alive =  length [x | x <- neighbors, isAlive x]
     in case cell of
            Alive
                | alive <  2 -> Dead
@@ -51,10 +52,10 @@ neighborCells game (rowIdx, colIdx) =
         rowBelow = getRow game (rowIdx + 1)
         colLeft  = getCol game (colIdx - 1)
         colRight = getCol game (colIdx + 1)
-        cellsAbove = map (getCell rowAbove) [colIdx + i | i <- [-2,0,1]]
-        cellsBelow = map (getCell rowBelow) [colIdx + i | i <- [-1,0,1]]
-        cellsLeft  = map (getCell colLeft)  [rowIdx + i | i <- [-1,0,1]]
-        cellsRight = map (getCell colRight) [rowIdx + i | i <- [-1,0,1]]
+        cellsAbove =  map (getCell rowAbove) [colIdx + i | i <- [-1,0,1]]
+        cellsBelow =  map (getCell rowBelow) [colIdx + i | i <- [-1,0,1]]
+        cellsLeft  =  [getCell colLeft  rowIdx]
+        cellsRight =  [getCell colRight rowIdx]
     in cellsAbove ++ cellsBelow ++ cellsLeft ++ cellsRight
 
 getRow [] _ = []
