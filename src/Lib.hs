@@ -5,10 +5,12 @@ import Data.Maybe (fromMaybe)
 import Debug.Trace (trace, traceShowId)
 import System.Random
 
-n = 10
-rands seed = randoms (mkStdGen seed) :: [Double]
--- game _ = [[Dead | i <- [1..n]],[Dead | i <- [1..n]],[Dead | i <- [1..n]], [Dead, Dead, Alive, Alive, Alive, Dead, Dead], [Dead | i <- [1..n]],[Dead | i <- [1..n]],[Dead | i <- [1..n]]]
-game seed = [[if round i == 1 then Alive else Dead | i <- take n $ drop (n*j) $ rands seed] | j <- [1..n]]
+n = 5
+game seed = 
+    let rands seed = randoms (mkStdGen seed) :: [Double]
+    in [[if round i == 1 then Alive else Dead
+            | i <- take n $ drop (n*j) $ rands seed]
+                     | j <- [1..n]]
 
 runGame :: Int -> Gol -> IO ()
 runGame n game = if n == 0 then putStrLn $ showGame game else do
@@ -35,7 +37,7 @@ step :: Gol -> Gol
 step game = map (uncurry $ stepRow game) $ indexed game
 stepRow game idx = map (uncurry $ stepCell game idx) . indexed
 stepCell game row col cell =
-    let neighbors = neighborCells game $ (row, col)
+    let neighbors = neighborCells game (row, col)
         alive =  length [x | x <- neighbors, isAlive x]
     in case cell of
            Alive
